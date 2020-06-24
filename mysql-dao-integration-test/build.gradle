@@ -1,0 +1,105 @@
+/*
+ *  Copyright 2020-present the original author or authors.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+// *********************************************************************************************************************
+// Apply plugins
+// *********************************************************************************************************************
+// Binary plugins - 
+// Due to Gradle's constrained syntax for the plugins block, binary plugin versions can't be expressed as properties
+// here. (This could be achieved if needed by moving the plugins to a pluginsManagement block in settings.gradle).
+plugins {
+  id 'eclipse'
+  id 'idea'
+  id 'java'
+}
+
+// *********************************************************************************************************************
+// Project Properties
+// *********************************************************************************************************************
+// Standard project properties. These are used as default values by some assembly and release task, e.g. jar
+// See gradle.properties and settings.gradle, e.g.
+//project.name - Property defined in settings.gradle, overriding the default used by Gradle which is based on proj dir
+//project.version - Property defined in gradle.properties
+
+// Extra user-defined project properties
+ext {
+  // Cribbed from https://github.com/mindscratch/reactor-offline/blob/master/build.gradle
+  javadocLinks = [
+    "https://download.java.net/java/GA/jdk14/docs/api/"
+  ] as String[]
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // Compile-time dependencies
+  ////implementation "foo:bar:${barVersion}"
+
+  // Test dependencies
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+  testImplementation("org.assertj:assertj-core:${assertjVersion}")
+  testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+  testRuntime("ch.qos.logback:logback-classic:${logbackClassicVersion}")
+}
+
+
+// *********************************************************************************************************************
+// Task configuration
+// *********************************************************************************************************************
+
+idea {
+  project {
+    jdkName = '14'
+    languageLevel = '14'
+    // Force IDEA project to use required bytecode version for access to Java language features.
+    targetBytecodeVersion = 'VERSION_14' 
+  }
+  module {
+    // Force IDEA module to use required bytecode version for access to Java language features. Contrary to Gradle
+    // manual docs for idea task, IJ does not inherit this value from the project
+    targetBytecodeVersion = 'VERSION_14' 
+  }
+}
+
+test {
+  useJUnitPlatform() // Enable support for JUnit 5+
+
+  // Propagate any Java system properties specified on launching Gradle that are used by the tests. This is necessary
+  // as the tests are run in a different JVM/java process to Gradle
+  systemProperties = (Map) System.properties.subMap(
+  )
+
+  testLogging {
+    showStandardStreams = true // Log any output that the tests write to stdout or stderr
+    events "passed", "skipped", "failed" // Log the execution of each test and its result
+  }
+}
+
+// *********************************************************************************************************************
+// Tasks
+// *********************************************************************************************************************
+
+// Custom task for running javadoc on Java classes in src/test/java
+task javadocTests(type: Javadoc, group: "documentation" ) {
+  description = 'Generates Javadoc API documentation for the test source code.'
+  source = sourceSets.test.allJava
+  classpath = sourceSets.test.compileClasspath
+  destinationDir = file("${buildDir}/docs/javadocTests")
+  options.links(project.ext.javadocLinks)
+  options.addBooleanOption('html5',true)
+}
