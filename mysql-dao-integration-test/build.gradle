@@ -48,7 +48,7 @@ repositories {
 
 dependencies {
   // Compile-time dependencies
-  ////implementation "foo:bar:${barVersion}"
+  implementation "mysql:mysql-connector-java:${mysqlJdbcDriverVersion}"
 
   // Test dependencies
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
