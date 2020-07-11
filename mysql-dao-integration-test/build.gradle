@@ -48,6 +48,7 @@ repositories {
 
 dependencies {
   // Compile-time dependencies
+  implementation "com.google.guava:guava:${guavaVersion}"
   implementation "com.zaxxer:HikariCP:${hikariCpVersion}"
   implementation "mysql:mysql-connector-java:${mysqlJdbcDriverVersion}"
 
