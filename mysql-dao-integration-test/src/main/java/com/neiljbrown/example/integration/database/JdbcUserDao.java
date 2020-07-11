@@ -67,4 +67,19 @@ public class JdbcUserDao {
       throw new RuntimeException("Error executing query [" + sqlQuery + "].", sqle);
     }
   }
+
+  /**
+   * @return the user ID of the last (most recently created) user.
+   */
+  public long findLastUserId() {
+    final String sqlQuery = "SELECT MAX(id) last_user_id FROM user";
+    try {
+      final PreparedStatement preparedStatement = this.dataSource.getConnection().prepareStatement(sqlQuery);
+      final ResultSet resultSet = preparedStatement.executeQuery();
+      resultSet.next();
+      return resultSet.getLong("last_user_id");
+    } catch (SQLException sqle) {
+      throw new RuntimeException("Error executing query [" + sqlQuery + "].", sqle);
+    }
+  }
 }
