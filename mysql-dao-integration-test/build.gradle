@@ -57,12 +57,11 @@ dependencies {
   testImplementation("org.assertj:assertj-core:${assertjVersion}")
   testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
   testRuntime("ch.qos.logback:logback-classic:${logbackClassicVersion}")
-
-  // Import BOM to avoid the need to specify the version for every testcontainers module
+  // Testcontainers library - Import BOM to avoid the need to specify the version for every testcontainers module
   implementation platform("org.testcontainers:testcontainers-bom:${testcontainersVersion}")
-  testImplementation('org.testcontainers:mysql')
+  testImplementation('org.testcontainers:mysql') // Support for launching a MySQL RDBMS database container
+  testImplementation('org.testcontainers:junit-jupiter') // JUnit 5 rules
 }
-
 
 // *********************************************************************************************************************
 // Task configuration
