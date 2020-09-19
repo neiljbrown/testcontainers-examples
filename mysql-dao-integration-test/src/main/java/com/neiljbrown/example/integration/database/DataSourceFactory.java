@@ -48,7 +48,7 @@ public class DataSourceFactory {
    * @param driverClassName string containing fully-qualified name of the implementation of the JDBC Driver to use to
    * connect to the database server, e.g. com.mysql.jdbc.Driver. Optional. If not supplied (null) the implementation
    * of the DataSource in use will try to determine the class of Driver from the info supplied in {@code jdbcUrl}.
-   * @return
+   * @return the created {@link DataSource}.
    */
   public static DataSource createDataSource(String jdbcUrl, String username, String password, String driverClassName) {
     final HikariConfig hikariConfig = new HikariConfig();
