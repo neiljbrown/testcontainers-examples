@@ -18,9 +18,9 @@ package com.neiljbrown.example.integration.database;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
+import java.util.Properties;
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,23 +60,9 @@ public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support ext
   @Container
   private static final MySQLContainer MY_SQL_CONTAINER = new MySQLContainer("mysql:" + MYSQL_VERSION);
 
-  // Name of host on which DB server can be accessed. (Provided by Testcontainers lib, rather than assuming localhost).
-  private static String dbHost;
-  // Network port on which DB server can be accessed. (Dynamically allocated by Testcontainers lib to increase
-  // robustness of test by avoiding relying on a specific port being available across all environments).
-  private static Integer dbPort;
-
-  /** Initialise test case's static fixtures once before all tests run. */
-  @BeforeAll
-  static void beforeAll() {
-    dbHost = MY_SQL_CONTAINER.getHost();
-    dbPort = MY_SQL_CONTAINER.getFirstMappedPort();
-    logger.debug("MySQL DB server accessible on host {} and port {}.", dbHost, dbPort);
-  }
-
   /** Create test case. */
   JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support() {
-    final DataSource dataSource = DataSourceFactory.createDataSource();
+    final DataSource dataSource = this.createDataSource();
     this.jdbcUserDao = new JdbcUserDao(dataSource);
   }
 
@@ -91,5 +77,50 @@ public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support ext
     final Optional<User> userById = this.jdbcUserDao.findUserById(++lastUserId);
 
     assertThat(userById).isEmpty();
+  }
+
+  /**
+   * Creates the DataSource that the DAO under test will use to connect to the database. Supports overriding the
+   * JDBC URL and the MySQL DB user credentials used when testing against the contained-based MySQL DB server that's
+   * used by these tests.
+   * <p>
+   * When using the Testcontainer library's JUnit support for launching the container, the app's default configured
+   * JDBC URL needs to be customised / overridden to account for the MySQL server in the container being exposed /
+   * running on a random port (rather than the default 3306).
+   * <p>
+   * The Testcontainer library creates a MySQL DB user (and password) that can be used to connect to the launched
+   * instance of the MySQL DB server. Use this in place of the MySQL DB user credentials that the app is configured to
+   * use in other environments.
+   *
+   * @return a {@link DataSource} that's configured to connect to the MySQL DB server launched by the Testcontainer lib.
+   */
+  DataSource createDataSource() {
+    Properties dataSourceProperties = loadDataSourceProperties();
+    // Build a test specific JDBC URL to accommodate the MySQL server in the launched container running on random port
+    final String jdbcUrl = buildJdbcUrlForMySqlTestContainer(MY_SQL_CONTAINER.getHost(),
+      MY_SQL_CONTAINER.getFirstMappedPort(), dataSourceProperties);
+    logger.debug("Configured DataSource to connect to the MySQL database using built JDBC URL {}.", jdbcUrl);
+    return DataSourceFactory.createDataSource(jdbcUrl,
+      // Use the MySQL DB user account created by the Testcontainer library to support authenticating with the DB server
+      MY_SQL_CONTAINER.getUsername(), MY_SQL_CONTAINER.getPassword(),
+      dataSourceProperties.getProperty("driverClassName"));
+  }
+
+  /**
+   * Builds the JDBC URL that the test will configure the DataSource (that's used by the DAO under test) to use to
+   * connect to the MySQL server. Accommodates the fact that the MySQL server in the launched container is running on a
+   * random port, which needs to be used in place of the port configured for the app in production.
+   *
+   * @param hostname the hostname on which the MySQL server is running, typically localhost.
+   * @param port the port on which the MySQL server is running.
+   * @param dataSourceProperties  properties used to configure the the application's JDBC DataSource. Used to obtain
+   * the database name that's used to build the JDBC URL.
+   * @return the JDBC URL for accessing the application's DB.
+   */
+  private String buildJdbcUrlForMySqlTestContainer(String hostname, Integer port, Properties dataSourceProperties) {
+    return "jdbc:mysql://" + hostname + ":" + port + "/" +
+      dataSourceProperties.getProperty("dataSource.databaseName") +
+      // Disable use of SSL in dev to avoid MySQL logging warning about server's SSL certificate not being verified
+      "?useSSL=false";
   }
 }
