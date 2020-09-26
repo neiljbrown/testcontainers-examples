@@ -32,7 +32,7 @@ import com.neiljbrown.example.business.domain.User;
 
 /**
  * Integration tests of {@link JdbcUserDao} in conjunction with MySQL.
- * <p>
+ *
  * <h2>Support for Launching MySQL</h2>
  * This TestCase has been enhanced to remove the limitation (in the original version) of relying on an instance MySQL
  * running locally on the default port (i.e. accessible via localhost:3306). The Testcontainers library is used to
@@ -51,12 +51,9 @@ import com.neiljbrown.example.business.domain.User;
  * </ul>
 */
 @Testcontainers // Enable automatic start and stop of containers based on scanning for fields annotated @Container
-class JdbcUserDaoMySqlIntegrationTest {
+public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support extends AbstractJdbcUserDaoMySqlIntegrationTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(JdbcUserDaoMySqlIntegrationTest.class);
-
-  // Specific version of MySQL to use.
-  private static final String MYSQL_VERSION = "5.7.31";
+  private static final Logger logger = LoggerFactory.getLogger(JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support.class);
 
   // Launch a MySQL container that's shared by all test methods. (Declaring an @Container field as static results in
   // the created container being shared by all test methods - started once before first test and stopped after last).
@@ -69,9 +66,6 @@ class JdbcUserDaoMySqlIntegrationTest {
   // robustness of test by avoiding relying on a specific port being available across all environments).
   private static Integer dbPort;
 
-  // Class under test
-  private final JdbcUserDao jdbcUserDao;
-
   /** Initialise test case's static fixtures once before all tests run. */
   @BeforeAll
   static void beforeAll() {
@@ -81,7 +75,7 @@ class JdbcUserDaoMySqlIntegrationTest {
   }
 
   /** Create test case. */
-  JdbcUserDaoMySqlIntegrationTest() {
+  JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support() {
     final DataSource dataSource = DataSourceFactory.createDataSource();
     this.jdbcUserDao = new JdbcUserDao(dataSource);
   }
