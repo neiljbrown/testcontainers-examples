@@ -101,8 +101,7 @@ public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support ext
       MY_SQL_CONTAINER.getFirstMappedPort(), dataSourceProperties);
     logger.debug("Configured DataSource to connect to the MySQL database using built JDBC URL {}.", jdbcUrl);
     return DataSourceFactory.createDataSource(jdbcUrl,
-      // Use the MySQL DB user account created by the Testcontainer library to support authenticating with the DB server
-      MY_SQL_CONTAINER.getUsername(), MY_SQL_CONTAINER.getPassword(),
+      dataSourceProperties.getProperty("dataSource.user"), dataSourceProperties.getProperty("dataSource.password"),
       dataSourceProperties.getProperty("driverClassName"));
   }
 
