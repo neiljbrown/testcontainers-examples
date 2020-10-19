@@ -84,10 +84,13 @@ public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJdbcUrlSupport ex
    * <p>
    * The DataSource for the application's database is typically configured with a JDBC URL using the standard
    * connection URL syntax "jdbc:mysql://<hostname>:<port>/<database-name>". TestContainers supports reconfiguring
-   * the JDBC driver to connect to a containerised instance of (a specific version of) MySQL (which it launches on
-   * demand) by substituting the standard "jdbc:mysql:" protocol with the custom one "jdbc:tc:mysql:[mysql-version]".
-   * The hostname and port components of the connection URL are not used and ignore if specified, since
-   * Testcontainers always launches the containerised instance on random port on localhost.
+   * the JDBC driver to proxy connecting to a containerised instance of (a specific version of) MySQL (which it
+   * launches on demand) by substituting the standard "jdbc:mysql:" protocol with the custom one
+   * "jdbc:tc:mysql:[mysql-version]". The hostname and port components of the connection URL are not used and ignored
+   * if specified, since Testcontainers always launches the containerised instance on random port on localhost.
+   * <p>
+   * Testcontainers support for creating the database and initialising its schema is also used, by specifying a request
+   * param in the URL using a specified SQL script
    *
    * @param dataSourceProperties  properties used to configure the the application's JDBC DataSource. Used to obtain
    * the database name that's used to build the JDBC URL.
@@ -95,6 +98,13 @@ public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJdbcUrlSupport ex
    * will be launched by the Testcontainers library.
    */
   private String buildJdbcUrlForMySqlTestContainer(Properties dataSourceProperties) {
-    return "jdbc:tc:mysql:" + MYSQL_VERSION + ":///" + dataSourceProperties.getProperty("dataSource.databaseName");
+    return "jdbc:tc:mysql:" + MYSQL_VERSION + ":" +
+      // Note - Testcontainers ignores the DB hostname and port specified in the TC JDBC URL. According to the current
+      // docs you should be able to just leave them blank resulting in the component part of the string being "///".
+      // However, there appears to be a bug in Testcontainers (1.14.3) such that if the hostname is left blank then
+      // it does not respect a specified database name. The hostname is therefore being set to e.g. localhost.
+      "//localhost/" +
+      dataSourceProperties.getProperty("dataSource.databaseName") +
+      "?TC_INITSCRIPT=db/V1__create_user_table.sql";
   }
 }
