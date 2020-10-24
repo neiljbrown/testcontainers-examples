@@ -1,0 +1,28 @@
+= Testcontainers Examples
+:toc:
+:sectlinks:
+:sectnums:
+:sectnumlevels: 4
+:toclevels: 4
+
+== Purpose
+This Git repo contains a collection of code examples that demonstrate using the
+https://www.testcontainers.org/[Testcontainers Java library] to aid the task of writing integration tests for Java code
+that integrates with infrastructure such as RDBMS, message broker, etc.
+
+Testcontainers simplifies the task of writing highly realistic, out-of-process integration tests by automating the
+launching of (Docker) containers containing real, production implementations of infrastructure, and synchronising the
+lifecycle (startup and shutdown) of these containers with the lifecycle (setup and tear-down) of JUnit tests.
+
+The repo contains a number of folders each corresponding to a separate project containing its own collection
+of related code examples. The projects are listed and summarised below by folder name.
+
+== mysql-dao-integration-test
+This folder contains a Java/Gradle project containing examples of how to use Testcontainers to support writing an
+integration test between a Data Access Object (DAO) and a MySQL database. Testcontainers is used to launch a real,
+MySQL DB server in a container and create & initialise the application's database. These examples are implemented using
+Java alone, without any application framework (e.g. Spring) support, with a view to more clearly illustrating how
+application code integrates with the Testcontainers library, and the library's APIs. See the project's own README for
+more details.
+
+End.

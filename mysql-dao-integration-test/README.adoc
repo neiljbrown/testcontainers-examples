@@ -1,0 +1,72 @@
+= Testcontainers Examples for MySQL Integration Tests (Pure Java)
+:toc:
+:sectlinks:
+:sectnums:
+:sectnumlevels: 4
+:toclevels: 4
+
+== Purpose
+This project contains examples of using the Testcontainers Java library to support writing an integration test
+between a Data Access Object (DAO) and a MySQL database.
+
+The example tests use the Testcontainers library to launch a real, MySQL DB server in a container and create &
+initialise the application's database. Using Testcontainers has a no. of benefits. It avoids relying on MySQL having
+been manually installed and launched in the dev environment prior to the tests being running. It also ensures
+consistency of tests in the form of the correct version of MySQL being used, and the database being in a known starting
+state prior to the test.
+
+The examples in this project are implemented using Java (the JDK) alone, without any application framework (e.g. Spring)
+support, with a view to more clearly illustrating how application code integrates with the Testcontainers library, and
+the library's APIs.
+
+== Code Overview
+The source code, and its automated tests can be found in the standard folders for a Java project - src/main/java and
+src/test/java respectively.
+
+The project contains two examples of automated integration test classes that utilise Testcontainers (specifically
+it's mysql module) to support testing the integration of a DAO with a MySQL RDBMS. The tests are both implemented
+using JUnit 5, and both test the same simple production DAO (JdbcUserDao). However, as described below, they use
+different approaches that the Testcontainers library supports for launching containers from the test -
+
+* `JdbcUserDaoMySqlIntegrationTestUsingTestContainersJdbcUrlSupport` - (JUnit) DAO integration test class which uses
+the Testcontainers library's https://www.testcontainers.org/modules/databases/jdbc/#database-containers-launched-via-jdbc-url-scheme[customised JDBC URL based approach]
+to automate launching a new MySQL RDBMS instance running in a container. The same MySQL instance is shared by all
+of the tests in the test class.
+
+* `JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support` - (Junit) DAO integration test class which uses
+the Testcontainers library's alternative, annotation-based https://www.testcontainers.org/test_framework_integration/junit_5/[JUnit
+(5) integration support] to automate launching a container providing the MySQL RDBMS instance. This Testcontainers
+approach supports launching a new container before each test, as well as an instance that's shared by all tests. This
+integration test class only provides an example of the latter (which is the most common, and reduces the additional
+execution time of the tests).
+
+In summary, Testcontainers' custom JDBC URL integration approach illustrated in the first of the test classes
+mentioned above provides a simpler, albeit it less flexible approach than using Testcontainers' JUnit integration.
+
+== Prerequisites
+The project's codebase requires you install a JDK that supports Java 14 at minimum.
+
+== Generating IDE Projects
+If you'd like to view the source and/or run the project's tests from your IDE, the project's Gradle build script
+supports generating IDE project files for both Eclipse and IntelliJ IDEA.
+
+To generate an Eclipse project use the following command:
+
+`./gradlew cleanEclipse eclipse`
+
+To generate an IntelliJ IDEA project use the following command:
+
+`./gradlew cleanIdea idea`
+
+== Building & Running the Automated Tests
+The project's JUnit (5) tests can be run either from within your IDE or using the project's Gradle build script.
+
+The minimum required version of Gradle will be installed when you execute the build using the supplied Gradle wrapper
+script (./gradlew).
+
+To compile and run all the automated tests from the command line, enter the following command in the project's root
+folder:
+
+`./gradlew clean test`
+
+End.
