@@ -58,7 +58,9 @@ public class JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support ext
   // Launch a MySQL container that's shared by all test methods. (Declaring an @Container field as static results in
   // the created container being shared by all test methods - started once before first test and stopped after last).
   @Container
-  private static final MySQLContainer MY_SQL_CONTAINER = new MySQLContainer("mysql:" + MYSQL_VERSION);
+  private static final MySQLContainer MY_SQL_CONTAINER = (MySQLContainer) new MySQLContainer("mysql:" + MYSQL_VERSION)
+    .withDatabaseName(loadDataSourceProperties().getProperty(("dataSource.databaseName")))
+    .withInitScript("db/V1__create_user_table.sql");
 
   /** Create test case. */
   JdbcUserDaoMySqlIntegrationTestUsingTestContainersJUnit5Support() {

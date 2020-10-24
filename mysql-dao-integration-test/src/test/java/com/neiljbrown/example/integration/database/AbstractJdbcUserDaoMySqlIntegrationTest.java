@@ -26,15 +26,20 @@ abstract class AbstractJdbcUserDaoMySqlIntegrationTest {
   // Specific version of MySQL to use. (package-private)
   static final String MYSQL_VERSION = "5.7.31";
 
+  static Properties dataSourceProperties;
+
   // Class under test (package-private)
   JdbcUserDao jdbcUserDao;
 
-  Properties loadDataSourceProperties() {
-    Properties dataSourceProperties = new Properties();
-    try {
-      dataSourceProperties.load(this.getClass().getResourceAsStream("/datasource.properties"));
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to load datasource.properties.", e);
+  static Properties loadDataSourceProperties() {
+    if (dataSourceProperties == null) {
+      dataSourceProperties = new Properties();
+      try {
+        dataSourceProperties.load(
+          AbstractJdbcUserDaoMySqlIntegrationTest.class.getResourceAsStream("/datasource.properties"));
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to load datasource.properties.", e);
+      }
     }
     return dataSourceProperties;
   }
