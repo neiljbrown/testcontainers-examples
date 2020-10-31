@@ -16,8 +16,8 @@ consistency of tests in the form of the correct version of MySQL being used, and
 state prior to the test.
 
 The examples in this project are implemented using Java (the JDK) alone, without any application framework (e.g. Spring)
-support, with a view to more clearly illustrating how application code integrates with the Testcontainers library, and
-the library's APIs.
+support, with a view to more clearly illustrating how an application' test code integrates with the Testcontainers
+library, and the library's APIs.
 
 == Code Overview
 The source code, and its automated tests can be found in the standard folders for a Java project - src/main/java and
@@ -25,8 +25,8 @@ src/test/java respectively.
 
 The project contains two examples of automated integration test classes that utilise Testcontainers (specifically
 it's mysql module) to support testing the integration of a DAO with a MySQL RDBMS. The tests are both implemented
-using JUnit 5, and both test the same simple production DAO (JdbcUserDao). However, as described below, they use
-different approaches that the Testcontainers library supports for launching containers from the test -
+using JUnit 5, and both test the same simple production DAO (JdbcUserDao). However, as described below, they use and
+illustrate different approaches that the Testcontainers library supports for launching containers from the test -
 
 * `JdbcUserDaoMySqlIntegrationTestUsingTestContainersJdbcUrlSupport` - (JUnit) DAO integration test class which uses
 the Testcontainers library's https://www.testcontainers.org/modules/databases/jdbc/#database-containers-launched-via-jdbc-url-scheme[customised JDBC URL based approach]
